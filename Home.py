@@ -85,14 +85,14 @@ with col_a:
     sec_counts = df_tenders["sector_en"].value_counts().head(8).reset_index()
     fig = px.bar(sec_counts, x="count", y="sector_en", orientation="h", color="count", color_continuous_scale="Blues", template="plotly_dark")
     fig.update_layout(margin=dict(l=0, r=0, t=10, b=0), showlegend=False, height=300, coloraxis_showscale=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig)
 
 with col_b:
     st.markdown("### 🗺️ Tenders by Region")
     reg_counts = df_tenders["region_en"].value_counts().head(8).reset_index()
     fig2 = px.pie(reg_counts, names="region_en", values="count", hole=0.4, color_discrete_sequence=px.colors.sequential.Blues_r, template="plotly_dark")
     fig2.update_layout(margin=dict(l=0, r=0, t=10, b=0), height=300)
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2)
 
 # ── Top Market Players ──────────────────────────────────────────────────────────
 st.markdown("---")

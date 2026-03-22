@@ -129,4 +129,4 @@ else:
             margin=dict(l=0, r=0, t=20, b=0),
             height=350,
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig)

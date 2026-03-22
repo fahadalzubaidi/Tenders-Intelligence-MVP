@@ -113,7 +113,7 @@ if not treemap_data.empty:
         margin=dict(t=10, l=0, r=0, b=0),
         coloraxis_showscale=False,
     )
-    st.plotly_chart(fig_tree, use_container_width=True)
+    st.plotly_chart(fig_tree)
 
 # ── Sector Specialization Table ──────────────────────────────────────────────
 st.markdown("#### 📋 Full Specialist List (≥80% Concentration)")

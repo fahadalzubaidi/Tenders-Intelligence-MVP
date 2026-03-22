@@ -69,7 +69,7 @@ with tab1:
             height=540, margin=dict(l=0, r=0, t=10, b=0),
             yaxis=dict(autorange="reversed"), coloraxis_showscale=False,
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig)
 
         # Table
         st.dataframe(
@@ -235,4 +235,4 @@ with tab3:
         fig_bar.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                                height=360, margin=dict(t=10, b=0), xaxis_tickangle=-30,
                                coloraxis_showscale=False)
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar)

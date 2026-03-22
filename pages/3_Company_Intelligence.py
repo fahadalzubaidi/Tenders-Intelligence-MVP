@@ -99,7 +99,7 @@ with col_a:
     pie_data = pd.DataFrame({"Outcome": ["Wins", "Losses"], "Count": [int(v["wins"]), int(v["participations"] - v["wins"])]})
     fig_pie = px.pie(pie_data, names="Outcome", values="Count", color="Outcome", color_discrete_map={"Wins": "#4ade80", "Losses": "#f87171"}, hole=0.5, template="plotly_dark")
     fig_pie.update_layout(paper_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(t=10, b=0))
-    st.plotly_chart(fig_pie, use_container_width=True)
+    st.plotly_chart(fig_pie)
 
 with col_b:
     st.markdown("#### 💵 Bid Values")
@@ -107,7 +107,7 @@ with col_b:
     if len(bid_data) > 0:
         fig_hist = px.histogram(bid_data, x="price", nbins=20, color_discrete_sequence=["#60a5fa"], template="plotly_dark")
         fig_hist.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(t=10, b=0), showlegend=False)
-        st.plotly_chart(fig_hist, use_container_width=True)
+        st.plotly_chart(fig_hist)
 
 # ── Leaderboard ─────────────────────────────────────────────────────────────────
 st.markdown("### 🏅 Vendor Leaderboard (Top 20 by Participations)")
