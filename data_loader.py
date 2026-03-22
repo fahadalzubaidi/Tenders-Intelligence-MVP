@@ -3,7 +3,7 @@ import io
 import pandas as pd
 import streamlit as st
 
-DATA_PATH = "mock_tenders_data.json"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mock_tenders_data.json")
 
 # ── Required top-level keys for validation ──────────────────────────────────────
 REQUIRED_FIELDS = {"id", "tenderName", "proposals", "awarded_proposals"}
@@ -130,6 +130,13 @@ def _validate(raw: list) -> list[str]:
 
 @st.cache_data(show_spinner="Loading tenders data...")
 def _load_default() -> tuple[pd.DataFrame, pd.DataFrame]:
+    if not os.path.exists(DATA_PATH):
+        st.error(
+            "⚠️ **No default data file found.**\n\n"
+            "The file `mock_tenders_data.json` is missing from the project folder.\n\n"
+            "👈 Use **📂 Upload Custom Data** in the sidebar to load your own JSON dataset."
+        )
+        st.stop()
     with open(DATA_PATH, "r", encoding="utf-8") as f:
         raw = json.load(f)
     return _parse_raw(raw)
