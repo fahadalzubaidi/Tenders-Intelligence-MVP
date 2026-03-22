@@ -156,9 +156,8 @@ def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
 # ── Sidebar upload widget — call this from Home.py sidebar block ─────────────────
 def render_upload_widget():
     """Render the data-upload expander in the sidebar."""
-    no_default = not os.path.exists(DATA_PATH)
-    no_upload  = st.session_state.get("uploaded_raw") is None
-    # Auto-expand if there is no data at all
+    no_default  = not os.path.exists(DATA_PATH)
+    no_upload   = st.session_state.get("uploaded_raw") is None
     auto_expand = no_default and no_upload
 
     with st.sidebar:
@@ -173,42 +172,52 @@ def render_upload_widget():
             )
 
             if uploaded is not None:
-                # Size check (max 50 MB)
-                MAX_BYTES = 50 * 1024 * 1024
-                uploaded.seek(0, 2)
-                size = uploaded.tell()
-                uploaded.seek(0)
-                if size > MAX_BYTES:
-                    st.error(f"File is too large ({size/1024/1024:.1f} MB). Maximum allowed size is 50 MB.")
-                    return
+                already_loaded = (
+                    st.session_state.get("uploaded_filename") == uploaded.name
+                    and st.session_state.get("uploaded_raw") is not None
+                )
+                if already_loaded:
+                    # File already parsed from a previous run — skip re-parsing
+                    fname = st.session_state["uploaded_filename"]
+                    n     = len(st.session_state["uploaded_raw"])
+                    st.info(f"📄 Active: **{fname}** ({n:,} tenders)")
+                else:
+                    # Size check (max 50 MB)
+                    MAX_BYTES = 50 * 1024 * 1024
+                    uploaded.seek(0, 2)
+                    size = uploaded.tell()
+                    uploaded.seek(0)
+                    if size > MAX_BYTES:
+                        st.error(f"File too large ({size/1024/1024:.1f} MB). Max 50 MB.")
+                        return
 
-                # Parse JSON
-                try:
-                    raw = json.load(io.TextIOWrapper(uploaded, encoding="utf-8"))
-                except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                    st.error(f"❌ Invalid JSON file: {e}")
-                    return
+                    # Parse JSON (seek(0) ensures stream is at the start)
+                    try:
+                        uploaded.seek(0)
+                        raw = json.load(io.TextIOWrapper(uploaded, encoding="utf-8"))
+                    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                        st.error(f"❌ Invalid JSON file: {e}")
+                        return
 
-                # Validate structure
-                warnings = _validate(raw)
-                for w in warnings:
-                    st.warning(w)
+                    # Validate structure
+                    warns = _validate(raw)
+                    for w in warns:
+                        st.warning(w)
 
-                if not isinstance(raw, list):
-                    return
+                    if not isinstance(raw, list):
+                        return
 
-                st.session_state["uploaded_raw"] = raw
-                st.session_state["uploaded_filename"] = uploaded.name
-                st.success(f"✅ Loaded **{uploaded.name}** ({len(raw):,} tenders)")
-                st.rerun()
+                    st.session_state["uploaded_raw"]      = raw
+                    st.session_state["uploaded_filename"] = uploaded.name
+                    st.rerun()
 
-            # Show active data source + clear button
-            if st.session_state.get("uploaded_raw") is not None:
+            # Reset button
+            if st.session_state.get("uploaded_raw") is not None and uploaded is None:
                 fname = st.session_state.get("uploaded_filename", "custom file")
                 st.info(f"📄 Active: **{fname}**")
                 if st.button("🔄 Reset to default data", use_container_width=True):
-                    st.session_state.pop("uploaded_raw", None)
+                    st.session_state.pop("uploaded_raw",      None)
                     st.session_state.pop("uploaded_filename", None)
                     st.rerun()
-            elif not no_default:
+            elif not no_default and uploaded is None:
                 st.caption("Using default: `mock_tenders_data.json`")
